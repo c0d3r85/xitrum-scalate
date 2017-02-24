@@ -178,17 +178,14 @@ class ScalateEngine(
    */
   protected def createContext(
     templateUri: String, engine: STE,
-    currentAction: Action, options: Map[String, Any]
-  ): (RenderContext, StringWriter, PrintWriter) =
-  {
-    val buffer     = new StringWriter
-    val out        = new PrintWriter(buffer)
-    val context    = new DefaultRenderContext(templateUri, engine, out)
-    val attributes = context.attributes
+    currentAction: Action, options: Map[String, Any]): ScalateRenderContext =
+    {
+      val context = new ScalateRenderContext(templateUri, engine, currentAction)
+      val attributes = context.attributes
 
-    // For bindings in engine
-    attributes.update(ACTION_BINDING_ID,  currentAction)
-    attributes.update(CONTEXT_BINDING_ID, context)
+      // For bindings in engine
+      attributes.update(ACTION_BINDING_ID, currentAction)
+      attributes.update(CONTEXT_BINDING_ID, context)
 
     // Put action.at to context
     currentAction.at.foreach { case (k, v) =>
@@ -202,7 +199,7 @@ class ScalateEngine(
     }
 
     setFormats(context, currentAction, options)
-    (context, buffer, out)
+    context
   }
 
   protected def setFormats(context: RenderContext, currentAction: Action, options: Map[String, Any]) {
